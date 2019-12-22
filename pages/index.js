@@ -16,10 +16,7 @@ export default ()=> {
     }
     return (
         <div>
-            <Link href="./a?id=1" as ="/a/1" >
-                <Button> Goto_A </Button>
-            </Link>
-            <Button onClick = { gotoTest_B }> to test/b </Button>
+            <span>Index</span>
         </div>
     )
 } 

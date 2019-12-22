@@ -8,10 +8,15 @@ const A =  ({router,name}) => {
                 <Link href ="#aaa"><a> {name}</a></Link>
             </div>)
 }
-A.getInitialProps = ()=>{
-    return {
-        name:'xkx'
-    }
+A.getInitialProps = async (ctx)=>{
+    const promise = new Promise((resolve) =>{
+        setTimeout(()=>{
+            resolve({
+                name:"xkx"
+            })
+        },500)
+    })
+    return await promise
 }
 
 export default withRouter(A)
