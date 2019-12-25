@@ -4,19 +4,18 @@ import Router from 'next/router'
 
 
 export default ()=> {
-
-    function gotoTest_B() {
-        // console.log('button B has been clicked')
-        Router.push({
-            pathname:"/test/b",
-            query:{
-                id : 2
-            }
-        },'/b/2')
-    }
+    // function gotoTest_B() {
+    //     // console.log('button B has been clicked')
+    //     Router.push({
+    //         pathname:"/test/b",
+    //         query:{
+    //             id : 2
+    //         }
+    //     },'/b/2')
+    // }
     return (
-        <div>
+        <>
             <span>Index</span>
-        </div>
+        </>
     )
 } 
