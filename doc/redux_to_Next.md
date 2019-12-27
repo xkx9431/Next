@@ -41,12 +41,35 @@ function getOrCreateStore(initialState) {
   }
   return window[__NEXT_REUDX_STORE__]//存在就直接return
 }
+}
+//....
+```
++ issues 2
+    Comp.getInitialProps 方法直接讲数据序列化为如下格式：
+    ```
+    <script id="__NEXT_DATA__" type="application/json">
+      {"props":{"pageProps":{"test":"123"},"initialReduxState":{"counter":{"count":3},"user":{"username":"jokcy"}}},"page":"/","query":{},"buildId":"development"}</script
+    ><script
+      async=""
+      id="__NEXT_PAGE__/"
+      src="/_next/static/development/pages/index.js?ts=1554714764101"
+    ></script
+    ><script
+      async=""
+      id="__NEXT_PAGE__/_app"
+      src="/_next/static/development/pages/_app.js?ts=1554714764101"
+    >
+    ```
 
-export default Comp => {
-  class WithReduxApp extends React.Component {
-    constructor(props) {
-      super(props)
-      this.reduxStore = getOrCreateStore(props.initialReduxState)
+    考虑到，数据序列化以及反序列相关问题，直接用store.getState() 方法得到实时store.
+
+    ``` javascript
+    //... 接上
+    export default Comp => {
+    class WithReduxApp extends React.Component {
+        constructor(props) {
+        super(props)
+        this.reduxStore = getOrCreateStore(props.initialReduxState)
     }
 
     render() {
@@ -68,24 +91,21 @@ export default Comp => {
     }
   }
 
-  WithReduxApp.getInitialProps = async ctx => {
-    const reduxStore = getOrCreateStore()
+    WithReduxApp.getInitialProps = async ctx => {
+        const reduxStore = getOrCreateStore()
 
-    ctx.reduxStore = reduxStore
+        ctx.reduxStore = reduxStore
 
-    let appProps = {}
-    if (typeof Comp.getInitialProps === 'function') {
-      appProps = await Comp.getInitialProps(ctx)
+        let appProps = {}
+        if (typeof Comp.getInitialProps === 'function') {
+        appProps = await Comp.getInitialProps(ctx)
+        }
+
+        return {
+        ...appProps,
+        initialReduxState: reduxStore.getState(),// 直接get 快照，作为object 返回
+        }
     }
 
-    return {
-      ...appProps,
-      initialReduxState: reduxStore.getState(),
-    }
-  }
-
-  return WithReduxApp
-}
-
+    return WithReduxApp
 ```
-
