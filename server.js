@@ -2,12 +2,19 @@ const Koa = require('koa')
 const next  =require('next')
 const Router = require('koa-router')
 const session = require('koa-session')
+const Redis = require('ioredis')
+const RedisSessionStore  = require('./server/session-store')
 
 const dev = process.env.NODE_ENV!='production'
 
 const app = next({ dev })
 
 const handle = app.getRequestHandler()
+
+// create redis client
+const redis = new Redis()
+const redisSessionStore =  new RedisSessionStore(redis)
+
 
 app.prepare().then( ()=>{
 
@@ -17,7 +24,7 @@ app.prepare().then( ()=>{
     server.keys =['xkx develop Github App']
     const SESSION_CONFIG = {
         key:"xkx9431",
-        // store:{}
+        store: redisSessionStore
     }
 
     server.use(session(SESSION_CONFIG,server))
