@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import {Button,Layout,Icon,Input,Avatar} from 'antd'
 import { useState,useEffect,useCallback } from 'react'
+import Container from './Container'
+import getConfig from 'next/config'
 
 const { Header, Content, Footer} = Layout
-
+const { publicRuntimeConfig} = getConfig()
 
 
 export default ({ children }) => {
@@ -45,13 +47,17 @@ export default ({ children }) => {
                     </div>
                     <div className="header-right">
                         <div className="user">
-                        <Avatar></Avatar>
+                            <a href={publicRuntimeConfig.OAUTH_URL}>
+                                <Avatar size={40} icon ="user"/>
+                            </a>
                         </div>
                     </div>
                 </div>
             </Header>
             <Content>
-                { children }
+                <div className="content">
+                    <Container>{children}</Container>
+                </div>
             </Content>
             <Footer style={footerStyle}>
                 Develop by <strong>許凯旋</strong> @<a href="mailto:triumph_9431@qq.com">triumph_9431@qq.com</a>  All Rights reserved
