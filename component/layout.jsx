@@ -1,22 +1,15 @@
 import Link from 'next/link'
-import {Button,Layout,Icon,Input,Avatar} from 'antd'
+import {Layout,Icon,Input,Avatar,Tooltip,Dropdown,Menu} from 'antd'
 import { useState,useEffect,useCallback } from 'react'
+import {connect } from 'react-redux'
 import Container from './Container'
 import getConfig from 'next/config'
+import {logout} from '../store'
 
 const { Header, Content, Footer} = Layout
 const { publicRuntimeConfig} = getConfig()
 
-
-export default ({ children }) => {
-
-    const [search,setSearch] = useState('')
-
-    const handleSearchChange = useCallback((event)=>{
-        setSearch(event.target.value)
-    })
-
-    const handleOnSearch = useCallback(()=>{},[])
+function MyLayout({ children, user, logout }) {
 
     const iconStyle = {
         color:'white',
@@ -29,6 +22,33 @@ export default ({ children }) => {
     const  footerStyle = {
         textAlign:'center'
     }
+
+    const [search,setSearch] = useState('')
+
+    const handleSearchChange = useCallback((event)=>{
+        setSearch(event.target.value)
+    })
+
+    const handleOnSearch = useCallback(()=>{},[])
+
+    const handleAvatarClick = useCallback(e => {
+        e.preventDefault()
+    }, [])
+    const handleLogout = useCallback(() => {
+        logout()
+    },[])
+
+
+    const userDropdown = (
+        <Menu>
+        <Menu.Item>
+            <a href="#" onClick={handleLogout}>
+            登出
+            </a>
+        </Menu.Item>
+        </Menu>
+    )
+
     return (
         <Layout>
             <Header>
@@ -47,9 +67,19 @@ export default ({ children }) => {
                     </div>
                     <div className="header-right">
                         <div className="user">
-                            <a href={publicRuntimeConfig.OAUTH_URL}>
-                                <Avatar size={40} icon ="user"/>
-                            </a>
+                                {user && user.id ? (
+                                    <Dropdown overlay={userDropdown}>
+                                    <a href="/" onClick={handleAvatarClick}>
+                                        <Avatar size={40} src={user.avatar_url} />
+                                    </a>
+                                    </Dropdown>
+                                ) : (
+                                    <Tooltip title="Click for Login">
+                                    <a href={publicRuntimeConfig.OAUTH_URL}>
+                                        <Avatar size={40} icon="user" />
+                                    </a>
+                                    </Tooltip>
+                    )}
                         </div>
                     </div>
                 </div>
@@ -86,3 +116,13 @@ export default ({ children }) => {
         </Layout>
         )
 } 
+
+export default connect(function mapState(state){
+    return {
+        user:state.user,
+    }
+},function mapReducer(dispatch){
+    return{
+        logout:()=>dispatch(logout())
+    }
+})(MyLayout)
