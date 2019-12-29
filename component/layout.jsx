@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import Router, { withRouter } from 'next/router'
 import {Layout,Icon,Input,Avatar,Tooltip,Dropdown,Menu} from 'antd'
 import { useState,useEffect,useCallback } from 'react'
+import axios from 'axios'
 import {connect } from 'react-redux'
 import Container from './Container'
 import getConfig from 'next/config'
@@ -9,7 +11,7 @@ import {logout} from '../store'
 const { Header, Content, Footer} = Layout
 const { publicRuntimeConfig} = getConfig()
 
-function MyLayout({ children, user, logout }) {
+function MyLayout({ children, user, logout,router }) {
 
     const iconStyle = {
         color:'white',
@@ -27,7 +29,7 @@ function MyLayout({ children, user, logout }) {
 
     const handleSearchChange = useCallback((event)=>{
         setSearch(event.target.value)
-    })
+    },[setSearch])
 
     const handleOnSearch = useCallback(()=>{},[])
 
@@ -36,13 +38,30 @@ function MyLayout({ children, user, logout }) {
     }, [])
     const handleLogout = useCallback(() => {
         logout()
-    },[])
+    },[logout])
+
+    const handleGotoOAuth = useCallback((e)=>{
+        e.preventDefault()
+        axios.get(`/prepare-auth?url=${router.asPath}`)
+        .then(
+            resp=>{
+            if(resp.status===200){
+                location.href = publicRuntimeConfig.OAUTH_URL
+            }else{
+                console.log('prepar before oauth fail,' + resp)
+            }
+        }
+        ).catch(err=>{
+            console.log(err)
+        })
+    },
+    [])
 
 
     const userDropdown = (
         <Menu>
         <Menu.Item>
-            <a href="#" onClick={handleLogout}>
+            <a href="javascript:void(0)" onClick={handleLogout}>
             登出
             </a>
         </Menu.Item>
@@ -69,13 +88,14 @@ function MyLayout({ children, user, logout }) {
                         <div className="user">
                                 {user && user.id ? (
                                     <Dropdown overlay={userDropdown}>
-                                    <a href="/" onClick={handleAvatarClick}>
+                                    <a href={`/prepare-auth?url=${router.asPath}`} onClick={handleAvatarClick}>
                                         <Avatar size={40} src={user.avatar_url} />
                                     </a>
                                     </Dropdown>
                                 ) : (
                                     <Tooltip title="Click for Login">
-                                    <a href={publicRuntimeConfig.OAUTH_URL}>
+                                    <a href={publicRuntimeConfig.OAUTH_URL}
+                                    onClick = {handleGotoOAuth}>
                                         <Avatar size={40} icon="user" />
                                     </a>
                                     </Tooltip>
@@ -125,4 +145,4 @@ export default connect(function mapState(state){
     return{
         logout:()=>dispatch(logout())
     }
-})(MyLayout)
+})(withRouter(MyLayout))
