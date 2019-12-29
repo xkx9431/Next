@@ -11,7 +11,9 @@ import {logout} from '../store'
 const { Header, Content, Footer} = Layout
 const { publicRuntimeConfig} = getConfig()
 
-function MyLayout({ children, user, logout,router }) {
+function MyLayout({ children, user, logout, router }) {
+
+    const urlQuery = router.query && router.query.query
 
     const iconStyle = {
         color:'white',
@@ -25,13 +27,15 @@ function MyLayout({ children, user, logout,router }) {
         textAlign:'center'
     }
 
-    const [search,setSearch] = useState('')
+    const [search,setSearch] = useState(urlQuery||'')
 
     const handleSearchChange = useCallback((event)=>{
         setSearch(event.target.value)
     },[setSearch])
 
-    const handleOnSearch = useCallback(()=>{},[])
+    const handleOnSearch = useCallback(()=>{
+        Router.push(`/search?query=${search}`)
+    },[search])
 
     const handleAvatarClick = useCallback(e => {
         e.preventDefault()
@@ -61,7 +65,7 @@ function MyLayout({ children, user, logout,router }) {
     const userDropdown = (
         <Menu>
         <Menu.Item>
-            <a href="javascript:void(0)" onClick={handleLogout}>
+            <a href="" onClick={handleLogout}>
             登出
             </a>
         </Menu.Item>
@@ -74,7 +78,9 @@ function MyLayout({ children, user, logout,router }) {
                 <div className="header-inner">
                     <div className ="header-left">
                         <div className="logo">
-                            <Icon type="github" style={iconStyle}/>
+                            <Link href="/">
+                                <Icon type="github" style={iconStyle}/>
+                            </Link>
                         </div>
                         <div>
                             <Input.Search placeholder="search for repos" 
@@ -125,14 +131,21 @@ function MyLayout({ children, user, logout,router }) {
             `}
             </style>
             <style jsx global>{`
-                #__next {
-                    height:100%;
-                }
-                .ant-layout {
-                    height:100%;
-                }
+            #__next {
+                height: 100%;
+            }
+            .ant-layout {
+                min-height: 100%;
+            }
+            .ant-layout-header {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .ant-layout-content {
+                background: #fff;
+            }
             `}
-            </style>
+        </style>
         </Layout>
         )
 } 

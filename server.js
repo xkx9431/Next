@@ -1,10 +1,12 @@
 const Koa = require('koa')
+const KoaBody = require('koa-body')
 const next  =require('next')
 const Router = require('koa-router')
 const session = require('koa-session')
 const Redis = require('ioredis')
 const RedisSessionStore  = require('./server/session-store')
 const auth = require('./server/auth')
+const api = require('./server/api')
 const dev = process.env.NODE_ENV!='production'
 
 const app = next({ dev })
@@ -22,6 +24,9 @@ app.prepare().then( ()=>{
     const router = new Router();
 
     server.keys =['xkx develop Github App']
+    
+    server.use(KoaBody())
+
     const SESSION_CONFIG = {
         key:"xkx9431",
         store: redisSessionStore
@@ -31,6 +36,7 @@ app.prepare().then( ()=>{
 
     // 配置处理GitHub Oauth Login
     auth(server)
+    api(server)
 
     router.get('/a/:id', async (ctx)=>{
         const id  = ctx.params.id
