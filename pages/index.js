@@ -2,9 +2,10 @@ import axios from 'axios'
 import { useEffect } from 'react'
 import api from '../lib/api'
 import { Button, Icon } from 'antd'
-
+import getCofnig from 'next/config'
+import Repo from '../component/Repo'
 import { connect } from 'react-redux'
-
+const { publicRuntimeConfig } = getCofnig()
 function Index( {  userRepos, userStaredRepos, user }) {
     console.log(userRepos, userStaredRepos )
     if (!user || !user.id) {
@@ -39,9 +40,9 @@ function Index( {  userRepos, userStaredRepos, user }) {
                 </p>
             </div>
             <div className="user-repos">
-                {/* {userRepos.map(repo => (
-                    <Repo repo={repo} />
-                ))} */}
+                { userRepos.map( repo => (
+                    <Repo repo = { repo }  />
+                ) )}
                 {/* <Tabs activeKey={tabKey} onChange={handleTabChange} animated={false}>
                     <Tabs.TabPane tab="你的仓库" key="1">
                     {userRepos.map(repo => (
