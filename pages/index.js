@@ -1,17 +1,41 @@
 import axios from 'axios'
 import { useEffect } from 'react'
 import api from '../lib/api'
-import { Button, Icon } from 'antd'
+import { Button, Icon, Tabs } from 'antd'
 import getCofnig from 'next/config'
 import Repo from '../component/Repo'
 import { connect } from 'react-redux'
+import Router , { withRouter } from 'next/router'
+// import LRU from 'lru-cache'
+
 const { publicRuntimeConfig } = getCofnig()
-function Index( {  userRepos, userStaredRepos, user }) {
-    console.log(userRepos, userStaredRepos )
+let cachedUserRepos, cachedUserStaredRepos 
+const isServer = typeof window === 'undefined'
+function Index( { userRepos, userStaredRepos, user, router }) {
+
+    console.log( userRepos, userStaredRepos, user )
+
+    useEffect(() => {
+        if (!isServer) {
+        cachedUserRepos = userRepos
+        cachedUserStaredRepos = userStaredRepos
+        setTimeout(() => {
+            cachedUserRepos = null
+            cachedUserStaredRepos = null
+          }, 1000 * 60 * 10)
+        }
+    }, [userRepos, userStaredRepos])
+
+    const tabKey = router.query.key || '1'
+
+    const handleTabChange = activeKey => {
+        Router.push(`/?key=${activeKey}`)
+    }
+
     if (!user || !user.id) {
         return (
         <div className="root">
-            <p>亲，您还没有登录哦~</p>
+            <p> 请先登录哦~</p>
             <Button type="primary" href={publicRuntimeConfig.OAUTH_URL}>
             点击登录
             </Button>
@@ -34,16 +58,24 @@ function Index( {  userRepos, userStaredRepos, user }) {
                 <span className="login">{user.login}</span>
                 <span className="name">{user.name}</span>
                 <span className="bio">{user.bio}</span>
+                <p className="location">
+                    <Icon type="home"  style={{ marginRight: 10, marginTop:10 }} />
+                    {user.location}
+                </p>
                 <p className="email">
                     <Icon type="mail" style={{ marginRight: 10 }} />
-                    <a href={`mailto:${user.email}`}>{user.email}</a>
+                    <a href="mailto:triumph_9431@qq.com">triumph_9431@qq.com</a>
+                </p>
+                <p className="url">
+                    <Icon type="global" style={{ marginRight: 10 }} />
+                    <a href="https://xkx9431.github.io/xkx_blog">Kevin's Blog</a>
                 </p>
             </div>
             <div className="user-repos">
-                { userRepos.map( repo => (
+                {/* { userRepos.map( repo => (
                     <Repo repo = { repo }  />
-                ) )}
-                {/* <Tabs activeKey={tabKey} onChange={handleTabChange} animated={false}>
+                ) )} */}
+                <Tabs activeKey={tabKey} onChange={handleTabChange} animated={false}>
                     <Tabs.TabPane tab="你的仓库" key="1">
                     {userRepos.map(repo => (
                         <Repo key={repo.id} repo={repo} />
@@ -54,7 +86,7 @@ function Index( {  userRepos, userStaredRepos, user }) {
                         <Repo key={repo.id} repo={repo} />
                     ))}
                     </Tabs.TabPane>
-                </Tabs> */}
+                </Tabs>
             </div>
             <style jsx>{`
             .root {
@@ -126,8 +158,10 @@ Index.getInitialProps =async ({ ctx, reduxStore})=>{
         userStaredRepos: userStaredRepos.data,
     }
 }
-export default connect(function mapState(state) {
-    return {
-            user: state.user,
-    }
-})(Index)
+export default withRouter(
+    connect(function mapState(state) {
+        return {
+                user: state.user,
+        }
+    })( Index ),
+) 
