@@ -17,18 +17,6 @@ class MyApp extends App {
     loading:false
   }
 
-  static async getInitialProps(ctx) {
-    const { Component } = ctx
-    console.log('app init')
-    let pageProps = {}
-    if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx)
-    }
-    return {
-      pageProps,
-    }
-  }
-
   startLoading = ()=>{
     this.setState({
       loading:true
@@ -44,15 +32,23 @@ class MyApp extends App {
     Router.events.on('routerChangeComplete', this.stopLoading)
     Router.events.on('routerChangeError', this.stopLoading)
 
-    axios
-    .get('/github/search/repositories?q=react')
-    .then(resp=>console.log(resp))
   }
 
   componentWillUnmount(){
     Router.events.off('routerChangeStart', this.startLoading)
     Router.events.off('routerChangeComplete', this.stopLoading)
     Router.events.off('routerChangeError', this.stopLoading)
+  }
+
+  static async getInitialProps(ctx) {
+    const { Component } = ctx
+    let pageProps = {}
+    if (Component.getInitialProps) {
+      pageProps = await Component.getInitialProps(ctx)
+    }
+    return {
+      pageProps,
+    }
   }
 
   render() {
