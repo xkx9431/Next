@@ -39,6 +39,6 @@ github:{
 3. 根据认证得到的code`授权码`,来获取token，并且每次获取github 资源的时候带上 相关的session信息，其中session里面包含token 令牌， Client ID, Client Secret。
 4. 注意 token 令牌， Client ID, Client Secret，需要放在sever端，不暴露给client user.
 
-####  2. 接入接口处理完善机制
+####  3. 接入接口处理完善机制
 对于 client,server 的请求处理添加过滤分别处理机制。
 具体参考`./server/api`,对于`·path.startsWith('/github/'`进行URL替换，然后基于`./lib/api`接口进行判断，如果是服务端渲染，那么请求url 开头为`'https://api.github.com'`,否则正常Koa处理.
