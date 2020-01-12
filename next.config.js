@@ -1,4 +1,6 @@
 const withCss = require('@zeit/next-css')
+const webpack = require('webpack')
+const withBundleAnnalyzer = require('@zeit/next-bundle-analyzer')
 const config = require('./config')
 
 const configs = {
@@ -55,11 +57,28 @@ if (typeof require !== 'undefined') {
 const GITHUB_OAUTH_URL = 'https://github.com/login/oauth/authorize'
 const SCOPE = 'user'
 
-module.exports = withCss({
-  publicRuntimeConfig: {
-    GITHUB_OAUTH_URL,
-    OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${
-      config.github.client_id
-    }&scope=${SCOPE}`,
-  },
-})
+module.exports =withBundleAnnalyzer(
+  withCss({
+    webpack(config) {
+      config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/))
+      return config
+    },
+    publicRuntimeConfig: {
+      GITHUB_OAUTH_URL,
+      OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${
+        config.github.client_id
+      }&scope=${SCOPE}`,
+    },
+    analyzeBrowser: ['browser', 'both'].includes(process.env.BUNDLE_ANALYZE),
+    bundleAnalyzerConfig: {
+      server: {
+        analyzerMode: 'static',
+        reportFilename: '../bundles/server.html',
+      },
+      browser: {
+        analyzerMode: 'static',
+        reportFilename: '../bundles/client.html',
+      },
+    },
+  })
+) 

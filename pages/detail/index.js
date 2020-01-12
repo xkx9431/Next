@@ -2,7 +2,6 @@ import dynamic from 'next/dynamic'
 
 import withRepoBasic from '../../component/with-repo-basic'
 import api from '../../lib/api'
-
 const MDRenderer = dynamic(() => import('../../component/MarkdownRenderer'))
 
 function Detail({ readme }) {
@@ -15,8 +14,7 @@ Detail.getInitialProps = async ({
         req,
         res,
     },
-}) => {
-  // console.log('detail getInitialProps invoked')
+    }) => {
 
     const readmeResp = await api.request(
         {

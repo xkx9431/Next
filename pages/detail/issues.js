@@ -40,7 +40,7 @@ function IssueItem({ issue }) {
 
     const toggleShowDetail = useCallback(() => {
         setShowDetail(detail => !detail)
-        }, [])
+    }, [])
 
     return (
         <div>
@@ -146,17 +146,17 @@ function IssueItem({ issue }) {
      * TODO: 在标题上显示label！！！！！
      */
     function Issues({ initialIssues, labels, owner, name }) {
-        const [creator, setCreator] = useState()
-        const [state, setState] = useState()
-        const [label, setLabel] = useState([])
-        const [issues, setIssues] = useState(initialIssues)
-        const [fetching, setFetching] = useState(false)
+    const [creator, setCreator] = useState()
+    const [state, setState] = useState()
+    const [label, setLabel] = useState([])
+    const [issues, setIssues] = useState(initialIssues)
+    const [fetching, setFetching] = useState(false)
 
-        useEffect(() => {
-            if (!isServer) {
-            CACHE[`${owner}/${name}`] = labels
-            }
-        }, [owner, name, labels])
+    useEffect(() => {
+        if (!isServer) {
+        CACHE[`${owner}/${name}`] = labels
+        }
+    }, [owner, name, labels])
 
     const handleCreatorChange = useCallback(value => {
         setCreator(value)
@@ -258,36 +258,36 @@ function IssueItem({ issue }) {
 Issues.getInitialProps = async ({ ctx }) => {
   // console.log('issues getInitialProps invoked')
 
-  const { owner, name } = ctx.query
+    const { owner, name } = ctx.query
 
-  const full_name = `${owner}/${name}`
+    const full_name = `${owner}/${name}`
 
-  const fetchs = await Promise.all([
-    await api.request(
-      {
-        url: `/repos/${owner}/${name}/issues`,
-      },
-      ctx.req,
-      ctx.res,
-    ),
+    const fetchs = await Promise.all([
+            await api.request(
+            {
+                url: `/repos/${owner}/${name}/issues`,
+            },
+            ctx.req,
+            ctx.res,
+        ),
 
     CACHE[full_name]
-      ? Promise.resolve({ data: CACHE[full_name] })
-      : await api.request(
-          {
+    ? Promise.resolve({ data: CACHE[full_name] })
+    : await api.request(
+        {
             url: `/repos/${owner}/${name}/labels`,
-          },
-          ctx.req,
-          ctx.res,
+        },
+        ctx.req,
+        ctx.res,
         ),
-  ])
+    ])
 
   return {
-    owner,
-    name,
-    initialIssues: fetchs[0].data,
-    labels: fetchs[1].data,
-  }
+        owner,
+        name,
+        initialIssues: fetchs[0].data,
+        labels: fetchs[1].data,
+    }
 }
 
 export default withRepoBasic(Issues, 'issues')
