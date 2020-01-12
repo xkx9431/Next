@@ -45,3 +45,5 @@ app.prepare().then( ()=>{
 ```
 
 + [redux 集成到 next](https://github.com/xkx9431/Next/blob/master/doc/redux_to_Next.md)
+
++ [ 接入Github-Oauth ](https://github.com/xkx9431/Next/blob/master/doc/Oauthor_intro.md)

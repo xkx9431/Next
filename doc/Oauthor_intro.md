@@ -18,7 +18,9 @@ OAuth 2.0 is the industry-standard protocol for authorization. OAuth 2.0 focuses
 请求授权码，返回授权码，请求令牌，返回令牌
 
 1. 在自己的Github Settings -> Developer settings 中设置 自己的Oauth apps,并得到Client ID,Client Secret.
-![ 设置图片](https://raw.githubusercontent.com/xkx9431/Next/master/doc/asserts/oauth_userInfo.PNG)
+
+![设置图片](https://.github.com/xkx9431/Next/master/doc/asserts/oauth_userInfo.PNG)
+
 在`./next.config.js`下配置相关内容，让sever 在运行时候可以拿到 Client ID, Client Secret.
 
 ```javascript
@@ -36,3 +38,7 @@ github:{
 
 3. 根据认证得到的code`授权码`,来获取token，并且每次获取github 资源的时候带上 相关的session信息，其中session里面包含token 令牌， Client ID, Client Secret。
 4. 注意 token 令牌， Client ID, Client Secret，需要放在sever端，不暴露给client user.
+
+####  2. 接入接口处理完善机制
+对于 client,server 的请求处理添加过滤分别处理机制。
+具体参考`./server/api`,对于`·path.startsWith('/github/'`进行URL替换，然后基于`./lib/api`接口进行判断，如果是服务端渲染，那么请求url 开头为`'https://api.github.com'`,否则正常Koa处理.
